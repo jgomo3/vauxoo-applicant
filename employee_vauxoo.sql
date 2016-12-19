@@ -19,6 +19,15 @@ CREATE TABLE employee (
 );
 
 CREATE TABLE employee_hobby (
+    id serial PRIMARY KEY,
+    name text,
+    description text
+);
+
+CREATE TABLE employee_employee_hobby (
+    employee_fk integer REFERENCES employee (id),
+    hobby_fk integer REFERENCES employee_hobby (id),
+    CONSTRAINT employee_employee_hobby_pk PRIMARY KEY (employee_fk, hobby_fk)
 );
 
 -- Data
@@ -42,4 +51,26 @@ INSERT INTO employee (first_name, last_name, department_fk)
     employee_department D
     ON E.department = D.name;
 
+INSERT INTO employee_hobby (name, description) VALUES
+    ('Go', 'Ancient board game'),
+    ('Futbol', 'The foot and ball sport with an actual foot kicking a ball'),
+    ('Painting', 'One of the many arts');
 
+INSERT INTO employee_employee_hobby (employee_fk, hobby_fk)
+    SELECT EI.id, HI.id FROM
+    (VALUES
+        ('Employee0', 'Cero', 'Go'),
+        ('Employee0', 'Cero', 'Futbol'),
+        ('Employee1', 'Uno', 'Painting'),
+        ('Employee1', 'Uno', 'Futbol'),
+        ('Employee2', 'Dos', 'Painting'),
+        ('Employee2', 'Dos', 'Go'),
+        ('Employee3', 'Tres', 'Futbol'),
+        ('Employee3', 'Tres', 'Go')
+    ) ET (first_name, last_name, hobby)
+    INNER JOIN
+    employee EI
+    ON ET.first_name = EI.first_name AND ET.last_name = EI.last_name
+    INNER JOIN
+    employee_hobby HI
+    ON ET.hobby = HI.name;
