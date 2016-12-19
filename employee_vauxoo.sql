@@ -15,7 +15,8 @@ CREATE TABLE employee (
     id serial PRIMARY KEY,
     first_name text,
     last_name text,
-    department_fk integer REFERENCES employee_department (id)
+    department_fk integer REFERENCES employee_department (id),
+    boss_fk integer REFERENCES employee (id)
 );
 
 CREATE TABLE employee_hobby (
@@ -74,3 +75,19 @@ INSERT INTO employee_employee_hobby (employee_fk, hobby_fk)
     INNER JOIN
     employee_hobby HI
     ON ET.hobby = HI.name;
+
+UPDATE employee EE SET boss_fk = B.id
+FROM
+    (VALUES
+        ('Employee0', 'Cero', 'Employee0', 'Cero'), -- Cero has no boss \m/
+        ('Employee1', 'Uno', 'Employee0', 'Cero'),
+        ('Employee2', 'Dos', 'Employee1', 'Uno'),
+        ('Employee3', 'Tres', 'Employee1', 'Uno')
+    ) ET (employee_first_name, employee_last_name, boss_first_name, boss_last_name)
+    INNER JOIN
+    employee E
+    ON ET.employee_first_name = E.first_name AND ET.employee_last_name = E.last_name
+    INNER JOIN
+    employee B
+    ON ET.boss_first_name = B.first_name AND ET.boss_last_name = B.last_name
+WHERE EE.id = E.id;
